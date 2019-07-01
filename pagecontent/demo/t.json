@@ -1,0 +1,57 @@
+{
+    "seed": 67452,
+    "dataset_path": "/home/alexander/Schreibtisch/test/",
+    "eval": [],
+    "train": [
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/euler_rechenkunst01_1738_0031.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/euler_rechenkunst01_1738_0031.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/euler_rechenkunst01_1738_0031.mask.png",
+            "line_height_px": 23
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/euler_rechenkunst01_1738_0026.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/euler_rechenkunst01_1738_0026.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/euler_rechenkunst01_1738_0026.mask.png",
+            "line_height_px": 23
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/bohse_helicon_1696_0036.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/bohse_helicon_1696_0036.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/bohse_helicon_1696_0036.mask.png",
+            "line_height_px": 33
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/alberti_pictura_1540_0008.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/alberti_pictura_1540_0008.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/alberti_pictura_1540_0008.mask.png",
+            "line_height_px": 25
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/blumenbach_anatomie_1805_0049.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/blumenbach_anatomie_1805_0049.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/blumenbach_anatomie_1805_0049.mask.png",
+            "line_height_px": 23
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/estor_rechtsgelehrsamkeit02_1758_0119.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/estor_rechtsgelehrsamkeit02_1758_0119.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/estor_rechtsgelehrsamkeit02_1758_0119.mask.png",
+            "line_height_px": 28
+        }
+    ],
+    "test": [
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/dannhauer_catechismus10_1673_0108.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/dannhauer_catechismus10_1673_0108.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/dannhauer_catechismus10_1673_0108.mask.png",
+            "line_height_px": 28
+        },
+        {
+            "binary_path": "/home/alexander/Schreibtisch/test/images/basilius_legendi_1515_0008.png",
+            "image_path": "/home/alexander/Schreibtisch/test/images/basilius_legendi_1515_0008.png",
+            "mask_path": "/home/alexander/Schreibtisch/test/masks/basilius_legendi_1515_0008.mask.png",
+            "line_height_px": 24
+        }
+    ]
+}
