@@ -56,8 +56,8 @@ class PageContentDetection:
 
     def detect_border(self, data, image):
         pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle', n_max_boxes=1)
-        print(pred_page_coords)
         if self.settings.debug:
+
 
             original_img = np.stack((image,) * 3, axis=-1)
             if pred_page_coords is not None:
