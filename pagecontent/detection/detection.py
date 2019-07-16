@@ -55,9 +55,17 @@ class PageContentDetection:
             yield self.detect_border(pred * 255, data[i].image)
 
     def detect_border(self, data, image):
-        pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle', n_max_boxes=1)
+        pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle')
+        if len(pred_page_coords) > 1:
+            mask = np.zeros(image.shape)
+            for box in pred_page_coords:
+                pts = np.array(box, np.int32)
+                pts = pts.reshape((-1, 1, 2))
+                mask = cv2.fillPoly(mask, [pts], (255, 255, 255, 255))
+            plt.imshow(mask)
+            plt.show()
+            #preprocess_boxes()
         if self.settings.debug:
-
 
             original_img = np.stack((image,) * 3, axis=-1)
             if pred_page_coords is not None:
@@ -69,6 +77,37 @@ class PageContentDetection:
             plt.show()
         return pred_page_coords
 
+
+def draw_polygon(box):
+    pts = np.array([[10, 5], [20, 30], [70, 20], [50, 10]], np.int32)
+    pts = pts.reshape((-1, 1, 2))
+    img = cv2.polylines(img, [pts], True, (0, 255, 255))
+
+
+def preprocess_boxes(contours):
+    LENGTH = len(contours)
+    status = np.zeros((LENGTH, 1))
+
+    for i, cnt1 in enumerate(contours):
+        x = i
+        if i != LENGTH - 1:
+            for j, cnt2 in enumerate(contours[i + 1:]):
+                x = x + 1
+                val = min(status[i], status[x])
+                status[x] = status[i] = val
+
+
+    unified = []
+    maximum = int(status.max()) + 1
+    for i in range(maximum):
+        pos = np.where(status == i)[0]
+        if pos.size != 0:
+            cont = np.vstack(contours[i] for i in pos)
+            hull = cv2.convexHull(cont)
+            unified.append(hull)
+
+    cv2.drawContours(img, unified, -1, (0, 255, 0), 2)
+    cv2.drawContours(thresh, unified, -1, 255, -1)
 
 def create_data(image: np.ndarray, avg_letter_height: int) -> ImageData:
     binary_image = image.astype(np.uint8) / 255
@@ -89,6 +128,6 @@ if __name__ == "__main__":
 
     line_detector = PageContentDetection(setting_predictor)
 
-    page_path = os.path.join(project_dir, 'demo/images/basilius_legendi_1515_0008.png')
+    page_path = os.path.join(project_dir, 'demo/images/0077.bin.png')
     for _pred in line_detector.detect_paths([page_path]):
         pass
