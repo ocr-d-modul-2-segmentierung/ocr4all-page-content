@@ -60,7 +60,8 @@ class PageContentDetection:
 
     def detect_border(self, data, image):
         pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle',
-                                                    min_area=self.settings.min_contour_area)
+                                                    min_area=self.settings.min_contour_area,
+                                                    min_area_ratio=self.settings.min_area_ratio)
         if len(pred_page_coords) >= 1:
             points = np.array(list(chain.from_iterable(pred_page_coords)))
             edges = alpha_shape(points, image.size)
@@ -144,7 +145,7 @@ if __name__ == "__main__":
 
     line_detector = PageContentDetection(setting_predictor)
 
-    page_path = os.path.join(project_dir, 'demo/images/0077.bin.png')
+    page_path = os.path.join(project_dir, 'demo/images/0191.png')
 
     for _pred in line_detector.detect_paths([page_path]):
         pass

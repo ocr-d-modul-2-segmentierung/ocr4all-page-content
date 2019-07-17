@@ -6,9 +6,9 @@ from scipy.spatial import KDTree
 
 
 def find_boxes(boxes_mask: np.ndarray, mode: str= 'min_rectangle', min_area: float = 0.03,
-               p_arc_length: float=0.01, n_max_boxes=math.inf) -> list:
+               p_arc_length: float=0.01, n_max_boxes=math.inf, min_area_ratio: float = 0.7) -> list:
     """
-    From: https://github.com/dhlab-epfl/dhSegment/blob/master/dh_segment/post_processing/boxes_detection.py
+    Adapted From: https://github.com/dhlab-epfl/dhSegment/blob/master/dh_segment/post_processing/boxes_detection.py
     Finds the coordinates of the box in the binary image `boxes_mask`.
     :param boxes_mask: Binary image: the mask of the box to find. uint8, 2D array
     :param mode: 'min_rectangle' : minimum enclosing rectangle, can be rotated
@@ -40,20 +40,24 @@ def find_boxes(boxes_mask: np.ndarray, mode: str= 'min_rectangle', min_area: flo
         """
         polygon = geometry.Polygon([point for point in box])
         if polygon.area > min_area * boxes_mask.size:
-
             # Correct out of range corners
             box = np.maximum(box, 0)
             box = np.stack((np.minimum(box[:, 0], boxes_mask.shape[1]),
                             np.minimum(box[:, 1], boxes_mask.shape[0])), axis=1)
-
-            # return box
             return box, polygon.area
 
     if mode == 'min_rectangle':
+        #contours = sorted(contours, key=lambda t: cv2.contourArea(t))
         for c in contours:
+            area = cv2.contourArea(c)
             rect = cv2.minAreaRect(c)
             box = np.int0(cv2.boxPoints(rect))
-            found_boxes.append(validate_box(box))
+            box = validate_box(box)
+            if box:
+                if area / box[1] <= 0.7:
+                    continue
+            # Todo remove contours if area ratio is small and near border
+            found_boxes.append(box)
 
      # sort by area
     found_boxes = [fb for fb in found_boxes if fb is not None]

@@ -17,7 +17,7 @@ class PageContentSettings(NamedTuple):
 
     min_contour_area: float = 0.03  # Todo: Increase min contour area needed to include in the generation of the page
                                     # Todo: content the further the contour is located at the page border
-
+    min_area_ratio: float = 0.7
 
 
 
