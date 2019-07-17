@@ -5,7 +5,7 @@ from shapely import geometry
 from scipy.spatial import KDTree
 
 
-def find_boxes(boxes_mask: np.ndarray, mode: str= 'min_rectangle', min_area: float=0.01,
+def find_boxes(boxes_mask: np.ndarray, mode: str= 'min_rectangle', min_area: float = 0.03,
                p_arc_length: float=0.01, n_max_boxes=math.inf) -> list:
     """
     From: https://github.com/dhlab-epfl/dhSegment/blob/master/dh_segment/post_processing/boxes_detection.py
