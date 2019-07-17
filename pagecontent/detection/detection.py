@@ -13,6 +13,10 @@ from pagecontent.postprocessing import box_detection
 import cv2
 from pagecontent.detection.util import compute_char_height
 import os
+from shapely.geometry import Polygon
+import math
+from itertools import chain
+from pagecontent.detection.util import alpha_shape
 
 
 class PageContentDetection:
@@ -55,19 +59,28 @@ class PageContentDetection:
             yield self.detect_border(pred * 255, data[i].image)
 
     def detect_border(self, data, image):
-        pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle', n_max_boxes=1)
-        if self.settings.debug:
-
-
-            original_img = np.stack((image,) * 3, axis=-1)
-            if pred_page_coords is not None:
-                cv2.polylines(original_img, [pred_page_coords[:, None, :]], True, (0, 0, 255), thickness=5)
-            else:
-                print('No box found in {}'.format('on this page'))
-            plt.figure(figsize=(10, 10))
-            plt.imshow(original_img)
-            plt.show()
-        return pred_page_coords
+        pred_page_coords = box_detection.find_boxes(data.astype(np.uint8), mode='min_rectangle',
+                                                    min_area=self.settings.min_contour_area)
+        if len(pred_page_coords) >= 1:
+            points = np.array(list(chain.from_iterable(pred_page_coords)))
+            edges = alpha_shape(points, image.size)
+            polys = polygons(edges)
+            polys = np.flip(points[polys], axis=1)
+            poly = Polygon(polys)
+            if self.settings.debug:
+                x, y = poly.exterior.xy
+                mask = np.zeros(image.shape)
+                for box in pred_page_coords:
+                    pts = np.array(box, np.int32)
+                    pts = pts.reshape((-1, 1, 2))
+                    mask = cv2.fillPoly(mask, [pts], (255, 255, 255, 255))
+                f, ax = plt.subplots(1, 2, True, True)
+                ax[0].imshow(mask)
+                ax[1].imshow(image)
+                ax[1].plot(y, x)
+                plt.show()
+            return poly
+        return None
 
 
 def create_data(image: np.ndarray, avg_letter_height: int) -> ImageData:
@@ -80,6 +93,48 @@ def create_data(image: np.ndarray, avg_letter_height: int) -> ImageData:
     return image_data
 
 
+def polygons(edges: List[int]):
+    # Generates polygons from Delaunay edges
+    if len(edges) == 0:
+        return []
+
+    edges = list(edges.copy())
+
+    shapes = []
+
+    initial = edges[0][0]
+    current = edges[0][1]
+    points = [initial]
+    del edges[0]
+    while len(edges) > 0:
+        found = False
+        for idx, (i, j) in enumerate(edges):
+            if i == current:
+                points.append(i)
+                current = j
+                del edges[idx]
+                found = True
+                break
+            if j == current:
+                points.append(j)
+                current = i
+                del edges[idx]
+                found = True
+                break
+
+        if not found:
+            shapes.append(points)
+            initial = edges[0][0]
+            current = edges[0][1]
+            points = [initial]
+            del edges[0]
+
+    if len(points) > 1:
+        shapes.append(points)
+
+    return shapes
+
+
 if __name__ == "__main__":
     project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -89,6 +144,7 @@ if __name__ == "__main__":
 
     line_detector = PageContentDetection(setting_predictor)
 
-    page_path = os.path.join(project_dir, 'demo/images/basilius_legendi_1515_0008.png')
+    page_path = os.path.join(project_dir, 'demo/images/0077.bin.png')
+
     for _pred in line_detector.detect_paths([page_path]):
         pass
